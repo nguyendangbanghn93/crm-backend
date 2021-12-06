@@ -1,21 +1,18 @@
 // Configuring the database
 const mongoose = require("mongoose");
+const { dbConfigs } = require("../configs/db");
 const Role = require("../models/role");
 
 mongoose.Promise = global.Promise;
 // Connecting to the database
 mongoose
-  .connect(
-    process.env.MONGODB_URL ||
-      "mongodb+srv://bangnd:bangnd123456@mydb.nelyr.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }
-  )
+  .connect(dbConfigs.mongodbUrl, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
     console.log("Successfully connected to the database");
-    initial()
+    initial();
   })
   .catch((err) => {
     console.log("Could not connect to the database.", err);
@@ -26,24 +23,24 @@ function initial() {
   Role.estimatedDocumentCount((err, count) => {
     if (!err && count === 0) {
       new Role({
-        name: "user"
-      }).save(err => {
+        name: "user",
+      }).save((err) => {
         if (err) {
           console.log("error", err);
         }
         console.log("added 'user' to roles collection");
       });
       new Role({
-        name: "moderator"
-      }).save(err => {
+        name: "moderator",
+      }).save((err) => {
         if (err) {
           console.log("error", err);
         }
         console.log("added 'moderator' to roles collection");
       });
       new Role({
-        name: "admin"
-      }).save(err => {
+        name: "admin",
+      }).save((err) => {
         if (err) {
           console.log("error", err);
         }

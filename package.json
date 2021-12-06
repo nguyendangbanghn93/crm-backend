@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
-  "scripts":{"start" : "env-cmd -f ./.env nodemon server.js"},
+  "scripts": {
+    "start": "env-cmd -f ./.env nodemon server.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
