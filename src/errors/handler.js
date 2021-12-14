@@ -24,7 +24,7 @@ const errorCustomHandler = (res, error) => {
 const successCustomHandler = (
   res,
   result,
-  { status, message, customMessage, messageCode, code } = {}
+  { status = 200, message, customMessage, messageCode, code } = {}
 ) => {
   return res.status(status).json({
     success: true,
