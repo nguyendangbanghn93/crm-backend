@@ -58,7 +58,7 @@ services:
       - 27016:27016
     volumes:
       - './data:/data/mongodb3'
-  mongo-express:
+  mongodb-express:
     image: mongo-express
     restart: always
     ports:
@@ -67,7 +67,7 @@ services:
       - mongodb1
     environment:
       environment: null
-      ME_CONFIG_MONGODB_URL: mongodb://${IP_ADDRESS}:27014,${IP_ADDRESS}:27015,${IP_ADDRESS}:27016/crm?replicaSet=rs0
+      ME_CONFIG_MONGODB_URL: mongodb://${IP_ADDRESS}:27014/crm?replicaSet=rs0
 
 #     # va:
 #     #     container_name: va-app

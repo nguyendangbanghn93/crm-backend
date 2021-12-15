@@ -1,3 +1,9 @@
+const {
+  ErrorCustom,
+  errorCustomHandler,
+  successCustomHandler,
+} = require("./handler");
+
 const ERRORS = {
   UNKNOWN: {
     status: 500,
@@ -38,4 +44,9 @@ const ERRORS = {
 for (const key in ERRORS) {
   ERRORS[key].messageCode = key;
 }
-module.exports = ERRORS;
+module.exports = {
+  ERRORS,
+  ErrorCustom,
+  errorCustomHandler,
+  successCustomHandler,
+};

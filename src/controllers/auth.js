@@ -7,7 +7,7 @@ const {
 module.exports.register = async (req, res, next) => {
 
   try {
-    console.log(123);
+    console.log(a.qwe);
     throw new ErrorCustom(ERRORS.INVALID_TOKEN)
   } catch (error) {
     return errorCustomHandler(res, error);

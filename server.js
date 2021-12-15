@@ -5,6 +5,10 @@ const app = express();
 var corsOptions = {
   origin: "http://localhost:8081",
 };
+const dotenv = require('dotenv');
+const dotenvExpand = require('dotenv-expand');
+const myEnv = dotenv.config();
+dotenvExpand(myEnv);
 app.use(cors(corsOptions));
 // parse requests of content-type - application/json
 // parse requests of content-type - application/x-www-form-urlencoded

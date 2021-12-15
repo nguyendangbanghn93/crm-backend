@@ -1,5 +1,5 @@
 class ErrorCustom extends Error {
-  constructor(obj) {
+  constructor(obj={}) {
     super(obj);
     this.status = obj.status || 500;
     this.success = obj.success || false;
@@ -7,32 +7,32 @@ class ErrorCustom extends Error {
     this.message = obj.message || "Unknown";
     this.customMessage = obj.customMessage || "";
     this.messageCode = obj.messageCode || "UNKNOWN";
-    this.code = obj || 1000;
+    this.code = obj.code || 1000;
   }
 }
 const errorCustomHandler = (res, error) => {
   console.log("____Lỗi_____\n", error);
-  return res.status(error.status).json({
-    success: error.success,
-    result: error.result || error,
-    message: error.message,
-    customMessage: error.customMessage,
-    messageCode: error.messageCode,
-    code: error.code,
+  return res.status(error.status|| 500).json({
+    success: error.success|| false,
+    // result: !error.status? error:null,
+    message: error.message|| "Unknown",
+    customMessage: error.customMessage|| "",
+    messageCode: error.messageCode|| "UNKNOWN",
+    code: error.code|| 1000,
   });
 };
 const successCustomHandler = (
   res,
   result,
-  { status = 200, message, customMessage, messageCode, code } = {}
+  { status, message, customMessage, messageCode, code } = {}
 ) => {
-  return res.status(status).json({
+  return res.status(status||200).json({
     success: true,
-    result,
-    message,
-    customMessage,
-    messageCode,
-    code,
+    result:result||{},
+    message:message||"Success",
+    customMessage:customMessage||"",
+    messageCode:messageCode||"SUCCESS",
+    code:code||200,
   });
 };
 module.exports = { ErrorCustom, errorCustomHandler, successCustomHandler };
