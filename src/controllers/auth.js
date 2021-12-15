@@ -8,7 +8,7 @@ module.exports.register = async (req, res, next) => {
 
   try {
     console.log(123);
-    return successCustomHandler(res, req.body);
+    throw new ErrorCustom(ERRORS.INVALID_TOKEN)
   } catch (error) {
     return errorCustomHandler(res, error);
   }
