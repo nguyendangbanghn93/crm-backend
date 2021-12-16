@@ -25,7 +25,7 @@ services:
       interval: 10s
       start_period: 30s
     volumes:
-      - './data:/data/mongodb1'
+      - ./data/mongo:/data/db
   mongodb2:
     image: mongo:4.2
     restart: always
@@ -40,8 +40,6 @@ services:
       ]
     ports:
       - 27015:27015
-    volumes:
-      - './data:/data/mongodb2'
   mongodb3:
     image: mongo:4.2
     restart: always
@@ -56,13 +54,11 @@ services:
       ]
     ports:
       - 27016:27016
-    volumes:
-      - './data:/data/mongodb3'
   mongodb-express:
     image: mongo-express
     restart: always
     ports:
-      - 8081:8081
+      - 8082:8081
     depends_on:
       - mongodb1
     environment:
