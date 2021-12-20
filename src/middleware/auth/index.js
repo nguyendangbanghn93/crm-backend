@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const ERRORS = require("../../errors");
+const { ERRORS } = require("../../errors");
 const { ErrorCustom, errorCustomHandler } = require("../../errors/handler");
 const User = require("../../models/user");
 module.exports.auth = async (res, req, next) => {
@@ -15,10 +15,20 @@ module.exports.auth = async (res, req, next) => {
 };
 module.exports.verifyRegister = async (req, res, next) => {
   try {
-    const userByUsername = await User.findOne({ username: req.body.username });
-    if (userByUsername) throw new MyError(ERRORS.USERNAME_DUPLICATE);
-    const userByEmail = await User.findOne({ email: req.body.email });
-    if (userByEmail) throw new ErrorCustom(ERRORS.EMAIL_DUPLICATE);
+    const isUsernameExist = await User.count({
+      $and: [{ username: req.body.username }, { username: { $exists: true } }],
+    });
+    if (isUsernameExist) throw new ErrorCustom(ERRORS.USERNAME_DUPLICATE);
+
+    const isEmailExist = await User.count({
+      $and: [{ email: req.body.email }, { email: { $exists: true } }],
+    });
+    if (isEmailExist) throw new ErrorCustom(ERRORS.EMAIL_DUPLICATE);
+
+    // if() idFacebook
+
+    // if() idGoogle
+
     next();
   } catch (error) {
     return errorCustomHandler(res, error);

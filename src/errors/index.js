@@ -6,21 +6,21 @@ const {
 
 const ERRORS = {
   UNKNOWN: {
-    status: 500,
+    status: 200,
     success: false,
     result: null,
     message: "Unknown",
     code: 1000,
   },
   USERNAME_DUPLICATE: {
-    status: 400,
+    status: 200,
     success: false,
     result: null,
     message: "Username duplicate",
     code: 1001,
   },
   EMAIL_DUPLICATE: {
-    status: 400,
+    status: 200,
     success: false,
     result: null,
     message: "Email duplicate",
@@ -39,6 +39,13 @@ const ERRORS = {
     result: null,
     message: "Unauthorized",
     code: 1004,
+  },
+  DATA_VALIDATION_ERROR: {
+    status: 200,
+    success: false,
+    result: null,
+    message: "Data validation error",
+    code: 1005,
   },
 };
 for (const key in ERRORS) {

@@ -1,19 +1,49 @@
 const mongoose = require("mongoose");
-const ERRORS = require("../errors");
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { verifyJwt } = require("../utils");
 const { authConfigs } = require("../configs/auth");
-const userSchema = new mongoose.Schema({
-  username: String,
-  email: String,
-  password: String,
-  roles: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Role",
+const { SystemRole, Status, Gender } = require("../enum");
+const bcrypt = require("bcryptjs");
+const userSchema = new mongoose.Schema(
+  {
+    username: String,
+    email: String,
+    password: String,
+    avatar: String,
+    phoneNumber: String,
+    activeToken: String,
+    gender: {
+      type: String,
+      enum: Object.values(Gender),
     },
-  ],
+    status: {
+      type: Number,
+      enum: Object.values(Status),
+      default: Status.DEACTIVE,
+    },
+    role: {
+      type: Number,
+      enum: Object.values(SystemRole),
+    },
+  },
+  { timestamps: true }
+);
+userSchema.set("toJSON", {
+  transform: function (doc, ret, opt) {
+    try {
+      delete ret["password"];
+      delete ret["tokens"];
+      delete ret["activeToken"];
+    } catch (e) {}
+    return ret;
+  },
+});
+userSchema.pre("save", async function (next) {
+  const user = this;
+  if (user.isModified("password")) {
+    user.password = await bcrypt.hash(user.password, authConfigs.salt);
+  }
+  next();
 });
 
 userSchema.statics = {
@@ -22,6 +52,7 @@ userSchema.statics = {
   verifyRefreshToken: async (refreshToken) =>
     verifyJwt(refreshToken, authConfigs.refreshTokenSecret),
 };
+
 userSchema.methods = {
   ...userSchema.methods,
   generateAuthToken: () => {

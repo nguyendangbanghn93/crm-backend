@@ -14,11 +14,11 @@ const errorCustomHandler = (res, error) => {
   console.log("____Lỗi_____\n", error);
   return res.status(error.status|| 500).json({
     success: error.success|| false,
-    // result: !error.status? error:null,
     message: error.message|| "Unknown",
     customMessage: error.customMessage|| "",
     messageCode: error.messageCode|| "UNKNOWN",
     code: error.code|| 1000,
+    ...error
   });
 };
 const successCustomHandler = (
