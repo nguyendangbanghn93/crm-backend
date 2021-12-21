@@ -10,9 +10,24 @@ router.post(
   validatorsAuth.register,
   authController.register
 );
-router.post("/login");
-router.get("/info");
-router.post("/active");
-router.post("/forgot_password");
-router.post("/change_password");
+router.post(
+  "/resend_email_active",
+  validatorsAuth.resendEmailActive,
+  authController.resendEmailActive
+);
+router.post("/active", authController.active); //resendEmailActive
+router.post("/login", validatorsAuth.login, authController.login);
+router.get("/get_my_info", auth, authController.getMyInfo);
+router.post(
+  "/forgot_password",
+  validatorsAuth.forgotPassword,
+  authController.forgotPassword
+);
+router.post(
+  "/change_password",
+  validatorsAuth.changePassword,
+  auth,
+  authController.changePassword
+);
+
 module.exports = router;
