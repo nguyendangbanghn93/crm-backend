@@ -88,7 +88,6 @@ module.exports.changePassword = async (req, res) => {
     const user = req.user;
     await user.comparePassword(oldPassword);
     user.password = newPassword;
-    console.log(user);
     await user.save({ new: true });
     successCustomHandler(res, { newPassword });
   } catch (error) {
