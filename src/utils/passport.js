@@ -1,38 +1,44 @@
 const passport = require("passport");
-const facebookApi = require("../utils/facebookApi");
+const request = require("request-promise");
+const facebookConfigs = require("../configs/facebookConfigs");
 const FacebookStrategy = require("passport-facebook").Strategy;
-const {
-  facebook_key,
-  facebook_secret,
-  callback_url,
-} = require("../configs/facebookConfigs");
-// Passport session setup.
+
 passport.serializeUser(function (user, done) {
   done(null, user);
 });
-
 passport.deserializeUser(function (obj, done) {
   done(null, obj);
 });
-
 passport.use(
   new FacebookStrategy(
     {
-      clientID: facebook_key,
-      clientSecret: facebook_secret,
-      callbackURL: callback_url,
+      clientID: facebookConfigs.facebook_key,
+      clientSecret: facebookConfigs.facebook_secret,
+      callbackURL: facebookConfigs.callback_url,
+      profileFields: [
+        "id",
+        "displayName",
+        "link",
+        "picture.type(large)",
+        "email",
+        "birthday",
+      ],
+      passReqToCallback: true,
     },
-
-    function (accessToken, refreshToken, profile, done) {
-      process.nextTick(async function () {
-        const picture = await facebookApi.getProfilePicture(profile.id,accessToken);
-        console.log({ accessToken, refreshToken, profile, picture });
-
-        //Check whether the User exists or not using profile.id
-        // if (config.use_database) {
-        //   //Further code of Database.
-        // }
-        return done(null, profile);
+    async function (req, accessToken, refreshToken, profile, done) {
+      process.nextTick(function () {
+        try {
+          const data = profile?._json;
+          const info = {
+            idFacebook: data?.id,
+            name: data?.name,
+            email: data?.email,
+            avatar: data?.picture?.data?.url,
+          };
+          return done(null, info);
+        } catch (error) {
+          done(error);
+        }
       });
     }
   )

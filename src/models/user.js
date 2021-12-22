@@ -7,11 +7,13 @@ const bcrypt = require("bcryptjs");
 const { ErrorCustom, ERRORS } = require("../errors");
 const userSchema = new mongoose.Schema(
   {
-    username: String,
+    name: String,
     email: String,
     password: String,
     avatar: String,
     phoneNumber: String,
+    idFacebook: String,
+    idGoogle: String,
     gender: {
       type: String,
       enum: Object.values(Gender),
@@ -24,6 +26,7 @@ const userSchema = new mongoose.Schema(
     role: {
       type: Number,
       enum: Object.values(SystemRole),
+      default: SystemRole.USER,
     },
   },
   { timestamps: true }

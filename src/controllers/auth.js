@@ -5,12 +5,13 @@ const {
   errorCustomHandler,
   successCustomHandler,
 } = require("../errors");
-const nodemailer = require("nodemailer");
+
 const User = require("../models/user");
 const { authConfigs } = require("../configs/auth");
 const conn = require("../db");
-const { verifyJwt, randomString } = require("../utils");
+const { verifyJwt, randomString, sendEmail } = require("../utils");
 const { Status } = require("../enum");
+const passport = require("passport");
 module.exports.register = async (req, res) => {
   try {
     const session = await conn.startSession();
@@ -94,73 +95,60 @@ module.exports.changePassword = async (req, res) => {
     return errorCustomHandler(res, error);
   }
 };
-
-const sendMailForgotPassword = async (req) => {
+module.exports.loginFacebook = async (req, res) => {
   try {
-    const newPassword = randomString(12);
-    const smtpTrans = nodemailer.createTransport({
-      service: authConfigs.emailService,
-      host: authConfigs.emailHost,
-      auth: {
-        user: authConfigs.emailUser,
-        pass: authConfigs.emailPass,
-      },
-    });
-    const domain = req?.headers?.origin;
-    const mailOptions = {
-      to: req.body.email,
-      from: "Admin",
-      subject: "Active your email",
-      text: `<div style="white-space: pre-wrap;">
-      You have just submitted a password reset request. 
-      The newly reissued password is: "<b>${newPassword}</b>".
-      Visit the website <a href:"${domain}/login">${domain}/login</a> to login and change your password.
-      </div>`,
-    };
-    const send = await smtpTrans.sendMail(mailOptions);
-    if (!send) throw new ErrorCustom(ERRORS.SEND_MAIL_ERROR);
-    return newPassword;
+    passport.authenticate("facebook", { scope: "email" }).call(this, req, res);
   } catch (error) {
-    console.log(error);
-    throw new ErrorCustom(ERRORS.SEND_MAIL_ERROR);
+    res.redirect(`/views?error=${error.message}`);
   }
 };
-const sendActiveEmail = async (req, user) => {
-  try {
-    const activeToken = jwt.sign(
-      { id: user._id },
-      authConfigs.activeTokenSecret,
-      {
-        expiresIn: authConfigs.activeTokenLife,
+module.exports.loginFacebookCallback = async (req, res) => {
+  passport
+    .authenticate("facebook", async (err, data, info) => {
+      try {
+        if (err) throw new Error(err);
+        if (data) {
+          console.log(data);
+          const user = new User(data);
+        }
+        res.redirect("/views");
+      } catch (error) {
+        return res.redirect(`/views?error=${error.message}`);
       }
-    );
-
-    const smtpTrans = nodemailer.createTransport({
-      service: authConfigs.emailService,
-      host: authConfigs.emailHost,
-      auth: {
-        user: authConfigs.emailUser,
-        pass: authConfigs.emailPass,
-      },
-    });
-    const domain = req?.headers?.origin;
-    const mailOptions = {
-      to: user.email,
-      from: "Admin",
-      subject: "Active your email",
-      text:
-        "You are receiving this because you (or someone else) have requested active your account.\n\n" +
-        "Please click on the following link, or paste this into your browser to complete the process:\n\n" +
-        domain +
-        "/active/" +
-        activeToken +
-        "\n\n" +
-        "If you did not request this, please ignore this email and your password will remain unchanged.\n",
-    };
-    const send = await smtpTrans.sendMail(mailOptions);
-    if (!send) throw new ErrorCustom(ERRORS.SEND_MAIL_ERROR);
-    return activeToken;
-  } catch (error) {
-    throw new ErrorCustom(ERRORS.SEND_MAIL_ERROR);
-  }
+    })
+    .call(this, req, res);
+};
+const sendMailForgotPassword = async (req) => {
+  sendEmail(req.body.email, {
+    subject: "Forgot password",
+    text: `<div style="white-space: pre-wrap;">
+      You have just submitted a password reset request. 
+      The newly reissued password is: "<b>${randomString(12)}</b>".
+      Visit the website <a href:"${req?.headers?.origin}/login">${
+      req?.headers?.origin
+    }/login</a> to login and change your password.
+      </div>`,
+  });
+  return newPassword;
+};
+const sendActiveEmail = async (req, user) => {
+  const activeToken = jwt.sign(
+    { id: user._id },
+    authConfigs.activeTokenSecret,
+    {
+      expiresIn: authConfigs.activeTokenLife,
+    }
+  );
+  sendEmail(user.email, {
+    subject: "Active your email",
+    text:
+      "You are receiving this because you (or someone else) have requested active your account.\n\n" +
+      "Please click on the following link, or paste this into your browser to complete the process:\n\n" +
+      req?.headers?.origin +
+      "/active/" +
+      activeToken +
+      "\n\n" +
+      "If you did not request this, please ignore this email and your password will remain unchanged.\n",
+  });
+  return activeToken;
 };

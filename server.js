@@ -16,19 +16,18 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 require("./src/db");
-
+require("./src/Utils/passport");
 const routes = require("./src/routes");
 app.use("/v1/api", routes);
 app.get("/v1/api", (req, res) => {
   res.json({ message: "Welcome crm app" });
 });
-//test
-app.set('views', __dirname + '/src/views');
-app.set('view engine', 'ejs');
-app.get("/view", function (req, res) {
+
+app.set("views", "./src/views");
+app.set("view engine", "ejs");
+app.get("/views", function (req, res) {
   res.render("index", { user: req.user });
 });
-require("./src/utils/passport");
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);

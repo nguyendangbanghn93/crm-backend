@@ -1,4 +1,6 @@
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
+const { authConfigs } = require("../configs/auth");
 const { ERRORS, ErrorCustom } = require("../errors");
 module.exports.verifyJwt = async (token, secret) => {
   try {
@@ -22,3 +24,27 @@ module.exports.randomString = (length) => {
   return result;
 };
 
+module.exports.sendEmail = async (to, options) => {
+  try {
+    const smtpTrans = nodemailer.createTransport({
+      service: authConfigs.emailService,
+      host: authConfigs.emailHost,
+      auth: {
+        user: authConfigs.emailUser,
+        pass: authConfigs.emailPass,
+      },
+    });
+    const mailOptions = {
+      to,
+      from: "Admin",
+      subject: "Email from CRM system",
+      text: "Email from CRM system",
+      ...options,
+    };
+    const send = await smtpTrans.sendMail(mailOptions);
+    if (!send) throw new ErrorCustom(ERRORS.SEND_MAIL_ERROR);
+    return true;
+  } catch (error) {
+    throw new ErrorCustom(ERRORS.SEND_MAIL_ERROR);
+  }
+};
