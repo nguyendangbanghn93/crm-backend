@@ -5,8 +5,8 @@ const app = express();
 var corsOptions = {
   origin: "http://localhost:8081",
 };
-const dotenv = require('dotenv');
-const dotenvExpand = require('dotenv-expand');
+const dotenv = require("dotenv");
+const dotenvExpand = require("dotenv-expand");
 const myEnv = dotenv.config();
 dotenvExpand(myEnv);
 app.use(cors(corsOptions));
@@ -22,7 +22,13 @@ app.use("/v1/api", routes);
 app.get("/v1/api", (req, res) => {
   res.json({ message: "Welcome crm app" });
 });
-
+//test
+app.set('views', __dirname + '/src/views');
+app.set('view engine', 'ejs');
+app.get("/view", function (req, res) {
+  res.render("index", { user: req.user });
+});
+require("./src/utils/passport");
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
